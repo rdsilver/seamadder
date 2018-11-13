@@ -17,5 +17,5 @@ function setup() {
 function draw() {
   scale(startingWidth/img.width, startingHeight/img.height);
   image(img, 0, 0);
-  seamCarving();
+  seamAdder();
 }

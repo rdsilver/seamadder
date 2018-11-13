@@ -1,4 +1,4 @@
-function seamCarving() {
+function seamAdder() {
   let shouldRotate = Math.random() > .5;
   if (shouldRotate)
     rotateImage();
