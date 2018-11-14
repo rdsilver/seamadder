@@ -4,7 +4,9 @@ function seamAdder() {
     rotateImage();
 
   img.loadPixels();
+
   var seam = getSeamIndex();
+
   removeSeam(seam);
 
   if (shouldRotate)
@@ -26,7 +28,7 @@ function getSeamIndex() {
   var pixelXY = [];
   var currentX = Math.floor(Math.random() * img.width);
   var currentY = img.height-1;
-  pixelXY.push([currentX, currentY])
+  pixelXY.push([currentX, currentY]);
 
   while(currentY > 0) {
     let direction = Math.random();
@@ -53,6 +55,7 @@ function getSeamIndex() {
 
 function removeSeam(seam) {
   img.loadPixels();
+
   var newPixelArray = createNewPixelArray(seam, img.pixels).reverse();
 
   if (frameCount%3 == 0)
@@ -61,8 +64,10 @@ function removeSeam(seam) {
     img = createImage(img.width+1, img.height);
 
   img.loadPixels(newPixelArray);
-  for(var i=0;i<newPixelArray.length;i++) 
+  for(var i=0;i<newPixelArray.length;i+=2)  {
       img.pixels[i] = newPixelArray[i];
+      img.pixels[i+1] = newPixelArray[i+5];
+    }
   
   img.updatePixels();
 }
@@ -70,11 +75,14 @@ function removeSeam(seam) {
 function createNewPixelArray(seam, pixels) {
   var newPixelArray = [];
 
-  for(var i=pixels.length-1;i>=0;i--) {
+  for(var i=pixels.length-1;i>=0;i-=4) {
     if (i != seam[0]) {
-      newPixelArray.push(pixels[i]);
+      newPixelArray.push(pixels[i], pixels[i-1], pixels[i-2], pixels[i-3]);
     } else {
       if (frameCount%3 == 0) {
+        seam.shift();
+        seam.shift();
+        seam.shift();
         seam.shift();
       }
       else {
@@ -84,7 +92,6 @@ function createNewPixelArray(seam, pixels) {
         seam.shift();
         seam.shift();
         seam.shift();
-        i-=3;
       }
     }
   }
