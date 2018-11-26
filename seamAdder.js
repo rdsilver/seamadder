@@ -38,7 +38,7 @@ function getSeamIndex() {
     else if (direction >=  .66666)
       currentX++;
 
-    pixelXY.push([constrain(currentX, 0, img.width-1), --currentY]);
+    pixelXY.push([constrain(currentX, 1, img.width-1), --currentY]);
   }
   
   // Need to convert from pixelXY to rgba 
@@ -58,16 +58,15 @@ function removeSeam(seam) {
 
   var newPixelArray = createNewPixelArray(seam, img.pixels).reverse();
 
-  if (frameCount%3 == 0)
+  if (frameCount % 2 == 0)
     img = createImage(img.width-1, img.height);
   else
     img = createImage(img.width+1, img.height);
 
   img.loadPixels(newPixelArray);
-  for(var i=0;i<newPixelArray.length;i+=2)  {
+  for(var i=0;i<newPixelArray.length;i++)  {
       img.pixels[i] = newPixelArray[i];
-      img.pixels[i+1] = newPixelArray[i+5];
-    }
+  }
   
   img.updatePixels();
 }
@@ -79,15 +78,21 @@ function createNewPixelArray(seam, pixels) {
     if (i != seam[0]) {
       newPixelArray.push(pixels[i], pixels[i-1], pixels[i-2], pixels[i-3]);
     } else {
-      if (frameCount%3 == 0) {
+      if (frameCount % 2 == 0) {
         seam.shift();
         seam.shift();
         seam.shift();
         seam.shift();
       }
       else {
+        let average = [0,0,0,0];
+        average[0] = Math.round((pixels[i] + pixels[i-4])/2);
+        average[1] = Math.round((pixels[i-1] + pixels[i-5])/2);
+        average[2] = Math.round((pixels[i-2] + pixels[i-6])/2);
+        average[3] = Math.round((pixels[i-3] + pixels[i-7])/2);
         newPixelArray.push(pixels[i], pixels[i-1], pixels[i-2], pixels[i-3]);
-        newPixelArray.push(pixels[i], pixels[i-1], pixels[i-2], pixels[i-3]);
+        //newPixelArray.push(average[0], average[1], average[2], average[3]);
+        newPixelArray.push(average[0], average[1], average[2], average[3]);
         seam.shift();
         seam.shift();
         seam.shift();
