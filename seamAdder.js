@@ -7,7 +7,9 @@ function seamAdder() {
 
   var seam = getSeamIndex();
 
+  console.time();
   removeSeam(seam);
+  console.timeEnd();
 
   if (shouldRotate)
     rotateImage();
@@ -76,28 +78,15 @@ function createNewPixelArray(seam, pixels) {
 
   for(var i=pixels.length-1;i>=0;i-=4) {
     if (i != seam[0]) {
-      newPixelArray.push(pixels[i], pixels[i-1], pixels[i-2], pixels[i-3]);
+      newPixelArray.push(255, pixels[i-1], pixels[i-2], pixels[i-3]);
     } else {
-      if (frameCount % 2 == 0) {
-        seam.shift();
-        seam.shift();
-        seam.shift();
-        seam.shift();
+      if (frameCount % 2 == 1) {
+        newPixelArray.push(255, pixels[i-1], pixels[i-2], pixels[i-3], 255, pixels[i-1], pixels[i-2], pixels[i-3]);
       }
-      else {
-        let average = [0,0,0,0];
-        average[0] = Math.round((pixels[i] + pixels[i-4])/2);
-        average[1] = Math.round((pixels[i-1] + pixels[i-5])/2);
-        average[2] = Math.round((pixels[i-2] + pixels[i-6])/2);
-        average[3] = Math.round((pixels[i-3] + pixels[i-7])/2);
-        newPixelArray.push(pixels[i], pixels[i-1], pixels[i-2], pixels[i-3]);
-        //newPixelArray.push(average[0], average[1], average[2], average[3]);
-        newPixelArray.push(average[0], average[1], average[2], average[3]);
-        seam.shift();
-        seam.shift();
-        seam.shift();
-        seam.shift();
-      }
+      seam.shift();
+      seam.shift();
+      seam.shift();
+      seam.shift();
     }
   }
 
