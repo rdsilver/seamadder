@@ -7,9 +7,7 @@ function seamAdder() {
 
   var seam = getSeamIndex();
 
-  console.time();
   removeSeam(seam);
-  console.timeEnd();
 
   if (shouldRotate)
     rotateImage();
