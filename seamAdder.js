@@ -1,3 +1,6 @@
+// let total = 0;
+// let count = 0;
+
 function seamAdder() {
   let shouldRotate = Math.random() > .5;
   if (shouldRotate)
@@ -7,7 +10,13 @@ function seamAdder() {
 
   var seam = getSeamIndex();
 
+  // let a = millis();
   seamRemoveOrAdd(seam);
+  // total += millis() - a;
+  // count++;
+
+  // if (count == 100)
+  //   console.log(total/count);
 
   if (shouldRotate)
     rotateImage();
@@ -27,27 +36,27 @@ function rotateImage() {
 function getSeamIndex() {
   var pixelXY = [];
   var currentX = Math.floor(Math.random() * img.width);
-  var currentY = img.height-1;
+  var currentY = 0
   pixelXY.push([currentX, currentY]);
 
-  while(currentY > 0) {
+  while(currentY < img.height) {
     let direction = Math.random();
 
     if (direction <= .33333)
       currentX--;
-    else if (direction >=  .66666)
+    else if (direction >= .66666)
       currentX++;
 
-    pixelXY.push([constrain(currentX, 1, img.width-1), --currentY]);
+    pixelXY.push([constrain(currentX, 1, img.width-1), ++currentY]);
   }
-  
+
   // Need to convert from pixelXY to rgba 
   var rgbaIndexes = []
   for (var i=0;i<pixelXY.length;i++) {
     var x = pixelXY[i][0];
     var y = pixelXY[i][1];
     var index = (x+y*img.width)*4;
-    rgbaIndexes.push(index+3, index+2, index+1, index);
+    rgbaIndexes.push(index, index+1, index+2, index+3);
   }
 
   return rgbaIndexes;
@@ -57,10 +66,10 @@ function seamRemoveOrAdd(seam) {
   img.loadPixels();
 
   if (frameCount%2==0) {
-    newPixelArray = removeSeam(seam.reverse(), img.pixels);
+    newPixelArray = removeSeam(seam, img.pixels);
     img = createImage(img.width-1, img.height);
   } else {
-    newPixelArray = addSeam(seam, img.pixels).reverse();
+    newPixelArray = addSeam(seam, img.pixels);
     img = createImage(img.width+1, img.height);
   }
 
@@ -84,16 +93,14 @@ function removeSeam(seam, pixels) {
 
 function addSeam(seam, pixels) {
   var newPixelArray = [];
+  var seamIndex = 0;
 
-  for(var i=pixels.length-1;i>=0;i-=4) {
-    if (i != seam[0]) {
-      newPixelArray.push(255, pixels[i-1], pixels[i-2], pixels[i-3]);
+  for(var i=0;i<pixels.length;i+=4) {
+    if (i != seam[seamIndex]) {
+      newPixelArray.push(pixels[i], pixels[i+1], pixels[i+2], 255);
     } else {
-      newPixelArray.push(255, pixels[i-1], pixels[i-2], pixels[i-3], 255, pixels[i-1], pixels[i-2], pixels[i-3]);
-      seam.shift();
-      seam.shift();
-      seam.shift();
-      seam.shift();
+      newPixelArray.push(pixels[i], pixels[i+1], pixels[i+2], 255, pixels[i], pixels[i+1], pixels[i+2], 255);
+      seamIndex+=4;
     }
   }
 
