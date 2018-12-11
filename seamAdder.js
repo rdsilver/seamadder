@@ -15,7 +15,7 @@ function seamAdder() {
   // total += millis() - a;
   // count++;
 
-  // if (count == 100)
+  // if (count === 100)
   //   console.log(total/count);
 
   if (shouldRotate)
@@ -65,7 +65,8 @@ function getSeamIndex() {
 function seamRemoveOrAdd(seam) {
   img.loadPixels();
 
-  if (frameCount%2==0) {
+  shouldRemoveSeam = frameCount % 2 == 0;
+  if (shouldRemoveSeam) {
     newPixelArray = removeSeam(seam, img.pixels);
     img = createImage(img.width-1, img.height);
   } else {
@@ -92,15 +93,43 @@ function removeSeam(seam, pixels) {
 }
 
 function addSeam(seam, pixels) {
-  var newPixelArray = [];
-  var seamIndex = 0;
+  var newPixelArray = new Uint8ClampedArray(seam.length + pixels.length);
+  var index = 0;
+  var max = pixels.length;
+  var c = 0;
+  for(var i=0;i<max;i+=4) {
+    newPixelArray[c++] = pixels[i];
+    newPixelArray[c++] = pixels[i+1];
+    newPixelArray[c++] = pixels[i+2];
+    newPixelArray[c++] = 255;
+    if (i === seam[index]) {
+      newPixelArray[c++] = pixels[i];
+      newPixelArray[c++] = pixels[i+1];
+      newPixelArray[c++] = pixels[i+2];
+      newPixelArray[c++] = 255;
+      index+=4;
+    }
+  }
 
-  for(var i=0;i<pixels.length;i+=4) {
-    if (i != seam[seamIndex]) {
-      newPixelArray.push(pixels[i], pixels[i+1], pixels[i+2], 255);
-    } else {
-      newPixelArray.push(pixels[i], pixels[i+1], pixels[i+2], 255, pixels[i], pixels[i+1], pixels[i+2], 255);
-      seamIndex+=4;
+  return newPixelArray;
+}
+
+function swapSeam(seam, pixels) {
+  var newPixelArray = new Uint8ClampedArray(seam.length + pixels.length);
+  var index = 0;
+  var max = pixels.length;
+  var c = 0;
+  for(var i=0;i<max;i+=4) {
+    newPixelArray[c++] = pixels[i];
+    newPixelArray[c++] = pixels[i+1];
+    newPixelArray[c++] = pixels[i+2];
+    newPixelArray[c++] = 255;
+    if (i === seam[index]) {
+      newPixelArray[c++] = pixels[i];
+      newPixelArray[c++] = pixels[i+1];
+      newPixelArray[c++] = pixels[i+2];
+      newPixelArray[c++] = 255;
+      index+=4;
     }
   }
 
